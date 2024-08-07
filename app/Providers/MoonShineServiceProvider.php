@@ -5,66 +5,35 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\MoonShine\Resources\PacientesResource;
+use App\MoonShine\Resources\MedicoResource;
+use App\MoonShine\Resources\InventarioResource;
+use App\MoonShine\Resources\ServicioResource;
 use MoonShine\Providers\MoonShineApplicationServiceProvider;
-use MoonShine\MoonShine;
-use MoonShine\Menu\MenuGroup;
 use MoonShine\Menu\MenuItem;
-use MoonShine\Resources\MoonShineUserResource;
-use MoonShine\Resources\MoonShineUserRoleResource;
-use MoonShine\Contracts\Resources\ResourceContract;
-use MoonShine\Menu\MenuElement;
-use MoonShine\Pages\Page;
-use Closure;
+use Illuminate\Support\Facades\Auth;
 
 class MoonShineServiceProvider extends MoonShineApplicationServiceProvider
 {
     /**
-     * @return list<ResourceContract>
-     */
-    protected function resources(): array
-    {
-        return [];
-    }
-
-    /**
-     * @return list<Page>
-     */
-    protected function pages(): array
-    {
-        return [];
-    }
-
-    /**
-     * @return Closure|list<MenuElement>
+     * @return list<MenuElement>
      */
     protected function menu(): array
     {
-        return [
-            MenuGroup::make(static fn() => __('moonshine::ui.resource.system'), [
-                MenuItem::make(
-                    static fn() => __('moonshine::ui.resource.admins_title'),
-                    new MoonShineUserResource()
-                ),
-                MenuItem::make(
-                    static fn() => __('moonshine::ui.resource.role_title'),
-                    new MoonShineUserRoleResource()
-                ),
-            ]),
+        $user = Auth::user();
+        $menu = [];
 
-            MenuItem::make('pacientes', new PacientesResource()),
-            MenuItem::make('Agenda', static fn() => route('agenda.index'))
-            
-            
-        ];
-    }
+        if ($user) {
+            $menu[] = MenuItem::make('Pacientes', new PacientesResource())->canSee(fn() => $user->role == 'admin' || $user->role == 'medico' || $user->role == 'secretaria');
+            $menu[] = MenuItem::make('Consultas', static fn() => route('consultas.index'))->canSee(fn() => $user->role == 'admin' || $user->role == 'medico' || $user->role == 'secretaria');
+            $menu[] = MenuItem::make('Agenda', static fn() => route('agenda'))->canSee(fn() => $user->role == 'admin' || $user->role == 'medico' || $user->role == 'secretaria');
 
-    /**
-     * @return Closure|array{css: string, colors: array, darkColors: array}
-     */
-    protected function theme(): array
-    {
-        return [
-            'footer' => ''
-        ];
+            if ($user->role == 'admin') {
+                $menu[] = MenuItem::make('Medicos', new MedicoResource());
+                $menu[] = MenuItem::make('Servicios', new ServicioResource());
+                $menu[] = MenuItem::make('Inventarios', new InventarioResource());
+            }
+        }
+
+        return $menu;
     }
 }

@@ -10,11 +10,11 @@ class Cita extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id_pacientes', 'fecha', 'hora', 'motivo', 'notas'
+        'paciente_id', 'motivo', 'notas', 'fecha'
     ];
 
     public function paciente()
     {
-        return $this->belongsTo(Pacientes::class, 'id_pacientes');
+        return $this->belongsTo(Pacientes::class, 'paciente_id');
     }
 }
