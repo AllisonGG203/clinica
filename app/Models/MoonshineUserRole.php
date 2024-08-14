@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MoonshineUserRole extends Model
 {
-    use HasFactory;
+    protected $table = 'moonshine_user_roles';
 
-    protected $fillable = [
-        'name',
-    ];
+    protected $fillable = ['name'];
 }

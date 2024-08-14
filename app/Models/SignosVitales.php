@@ -2,19 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SignosVitales extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'consulta_id', 'talla', 'peso', 'temperatura', 'presion_arterial', 'frecuencia_cardiaca'
+        'cita_id', 'talla', 'peso', 'temperatura', 'presion_arterial', 'frecuencia_cardiaca'
     ];
 
-    public function consulta()
+    public function cita()
     {
-        return $this->belongsTo(Consulta::class);
+        return $this->belongsTo(Cita::class, 'cita_id');
     }
 }

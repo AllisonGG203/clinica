@@ -23,16 +23,14 @@ class CitaController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'id_pacientes' => 'required|exists:pacientes,id',
-            'fecha' => 'required|date',
-            'hora' => 'required|date_format:H:i',
-            'motivo' => 'required|string',
-            'notas' => 'nullable|string',
-        ]);
+        $cita = new Cita();
+    $cita->id_pacientes = $request->input('id_pacientes');
+    $cita->fecha = $request->input('fecha');
+    $cita->hora = $request->input('hora');
+    $cita->motivo = $request->input('motivo');
+    $cita->notas = $request->input('notas');
+    $cita->save();
 
-        Cita::create($request->all());
-
-        return redirect()->route('agenda.index')->with('success', 'Cita creada con éxito');
+        return redirect()->route('agenda.index')->with('success', 'Cita creada exitosamente');
     }
 }

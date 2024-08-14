@@ -3,21 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class MoonshineUser extends Authenticatable
 {
-    use HasFactory;
+    protected $table = 'moonshine_users';
 
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'moonshine_user_role_id'
+        'name', 'email', 'password', 'moonshine_user_role_id'
     ];
 
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
-
-    public function userRole()
+    public function role()
     {
         return $this->belongsTo(MoonshineUserRole::class, 'moonshine_user_role_id');
     }

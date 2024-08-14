@@ -48,7 +48,8 @@
             events: [
                 @foreach($citas as $cita)
                 {
-                    title: '{{ $cita->paciente->nombre }} - {{ $cita->hora }}',
+                    title: '{{ $cita->paciente ? $cita->paciente->nombre : "Paciente no asignado" }} - {{ $cita->hora }}',
+
                     start: '{{ $cita->fecha }}T{{ $cita->hora }}',
                     description: '{{ $cita->motivo }}'
                 },

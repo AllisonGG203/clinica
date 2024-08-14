@@ -8,6 +8,7 @@ class AgendaController extends Controller
 {
     public function index()
     {
+        // Lógica para obtener y mostrar la agenda
         return view('agenda.index');
     }
 }

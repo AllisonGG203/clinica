@@ -16,6 +16,7 @@ class CreateCitasTable extends Migration
             $table->string('motivo');
             $table->string('notas')->nullable();
             $table->timestamps();
+        
             $table->foreign('id_pacientes')->references('id')->on('pacientes')->onDelete('cascade');
         });
     }

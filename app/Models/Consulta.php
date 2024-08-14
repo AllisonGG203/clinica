@@ -14,17 +14,23 @@ class Consulta extends Model
     ];
 
     public function paciente()
-    {
-        return $this->belongsTo(Pacientes::class, 'paciente_id');
-    }
+{
+    return $this->belongsTo(Pacientes::class, 'id_pacientes');
+}
 
-    public function signosVitales()
-    {
-        return $this->hasOne(SignosVitales::class, 'consulta_id');
-    }
+public function signosVitales()
+{
+    return $this->hasOne(SignosVitales::class, 'consulta_id');
+}
 
-    public function recetas()
-    {
-        return $this->hasMany(Receta::class, 'consulta_id');
-    }
+public function receta()
+{
+    return $this->hasOne(Receta::class, 'consulta_id');
+}
+
+public function servicio()
+{
+    return $this->belongsTo(Servicio::class, 'servicio_id');
+}
+
 }

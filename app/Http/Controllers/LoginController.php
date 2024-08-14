@@ -16,13 +16,13 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
-
+        
         if (Auth::attempt($credentials)) {
             return redirect()->intended('dashboard');
         }
 
         return back()->withErrors([
-            'email' => 'These credentials do not match our records.',
+            'email' => 'The provided credentials do not match our records.',
         ]);
     }
 

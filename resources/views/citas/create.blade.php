@@ -20,7 +20,18 @@
         </div>
         <div class="form-group">
             <label for="hora">Hora</label>
-            <input type="time" class="form-control" id="hora" name="hora" required>
+            <select class="form-control" id="hora" name="hora" required>
+                @php
+                    $start = new DateTime('07:00');
+                    $end = new DateTime('18:00');
+                    $interval = new DateInterval('PT30M'); // Intervalo de 30 minutos
+                    $times = new DatePeriod($start, $interval, $end->add($interval));
+                @endphp
+                
+                @foreach ($times as $time)
+                    <option value="{{ $time->format('H:i') }}">{{ $time->format('h:i A') }}</option>
+                @endforeach
+            </select>
         </div>
         <div class="form-group">
             <label for="motivo">Motivo</label>

@@ -15,4 +15,6 @@ class pacientes extends Model
         'sexo',
         'telefono',
     ];
+
+    
 }
