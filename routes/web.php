@@ -8,33 +8,29 @@ use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\ConsultaController;
 
 
+
+
+Route::post('/consultas/generar-pdf', [ConsultaController::class, 'generarPDF'])->name('consultas.generarPDF');
+
+
+
+// Ruta para mostrar el resumen de la consulta
 Route::get('/consultas/resumen/{id}', [ConsultaController::class, 'resumen'])->name('consultas.resumen');
 
-
-
-// Ruta para la página principal
-Route::get('/', function () {
-    return redirect()->route('agenda.index');
-    return redirect()->route('consultas.consultar', ['id' => $consulta->id]);
-
-});
+// Ruta para mostrar el formulario de la consulta
 Route::get('/consultas/{id}/consultar', [ConsultaController::class, 'consultar'])->name('consultas.consultar');
-Route::get('/consultar/{id}', [ConsultaController::class, 'consultar'])->name('consultar');
-// Rutas de Agenda y Citas
+
+// Ruta para mostrar una consulta específica
+Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consultas.show');
+
+// Ruta para actualizar una consulta específica
+Route::put('/consultas/{consulta}', [ConsultaController::class, 'update'])->name('consultas.update');
+
+// Ruta para mostrar la página principal de la agenda
 Route::get('/agenda', [CitaController::class, 'index'])->name('agenda.index');
+Route::get('/consultas', [ConsultaController::class, 'index'])->name('consultas.index');
+// Rutas adicionales de citas y médicos
 Route::get('/citas/create', [CitaController::class, 'create'])->name('citas.create');
 Route::post('/citas', [CitaController::class, 'store'])->name('citas.store');
-Route::get('/agenda', [CitaController::class, 'index'])->name('agenda');
-Route::get('/consultas/resumen/{id}', [ConsultaController::class, 'resumen'])->name('consultas.resumen');
 
-// Rutas de Consultas
-Route::get('/consultas', [ConsultaController::class, 'index'])->name('consultas.index');
-Route::get('/consultas/create', [ConsultaController::class, 'create'])->name('consultas.create');
-Route::post('/consultas', [ConsultaController::class, 'store'])->name('consultas.store');
-Route::get('/consultas/{consulta}', [ConsultaController::class, 'show'])->name('consultas.show');
-Route::get('/consultas/resumen/{consulta}', [ConsultaController::class, 'resumen'])->name('consultas.resumen');
-Route::put('/consultas/{consulta}', [ConsultaController::class, 'update'])->name('consultas.update');
-Route::delete('/consultas/{consulta}', [ConsultaController::class, 'destroy'])->name('consultas.destroy');
-
-// Rutas de Medicos
 Route::resource('medico', MedicoController::class);

@@ -55,36 +55,43 @@
             </div>
         </div>
 
-        <!-- Receta -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h3>Receta</h3>
-            </div>
-            <div class="card-body">
-                <div class="form-group">
+<!-- Receta -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h3>Receta</h3>
+    </div>
+    <div class="card-body">
+        <div id="recetas-container">
+            <div class="form-row align-items-end mb-2 receta-item">
+                <div class="col">
                     <label for="medicamento">Medicamento:</label>
-                    <select name="medicamento" id="medicamento" class="form-control">
+                    <select name="medicamento[]" class="form-control">
                         @foreach($medicamentos as $medicamento)
-                            <option value="{{ $medicamento->id }}" {{ $cita->receta && $cita->receta->medicamento_id == $medicamento->id ? 'selected' : '' }}>
-                                {{ $medicamento->nombre_medicamento }}
-                            </option>
+                            <option value="{{ $medicamento->id }}">{{ $medicamento->nombre_medicamento }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="col">
                     <label for="cantidad">Cantidad:</label>
-                    <input type="number" name="cantidad" value="{{ old('cantidad', $cita->receta->cantidad ?? '') }}" class="form-control" required>
+                    <input type="number" name="cantidad[]" class="form-control" required>
                 </div>
-                <div class="form-group">
+                <div class="col">
                     <label for="frecuencia">Frecuencia:</label>
-                    <input type="text" name="frecuencia" value="{{ old('frecuencia', $cita->receta->frecuencia ?? '') }}" class="form-control" required>
+                    <input type="text" name="frecuencia[]" class="form-control" required>
                 </div>
-                <div class="form-group">
+                <div class="col">
                     <label for="duracion">Duración:</label>
-                    <input type="text" name="duracion" value="{{ old('duracion', $cita->receta->duracion ?? '') }}" class="form-control" required>
+                    <input type="text" name="duracion[]" class="form-control" required>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-success add-receta">+</button>
+                    <button type="button" class="btn btn-danger remove-receta">-</button>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
 
         <!-- Servicio -->
         <div class="card mb-4">
@@ -108,7 +115,55 @@
         <!-- Botones de acción -->
         <div class="form-group">
             <button type="submit" name="accion" value="finalizar" class="btn btn-success">Finalizar Consulta</button>
+            <button type="submit" formaction="{{ route('consultas.generarPDF') }}" class="btn btn-primary">Imprimir</button>
         </div>
     </form>
 </div>
 @endsection
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const recetasContainer = document.getElementById('recetas-container');
+
+    // Añadir nueva línea
+    document.addEventListener('click', function (event) {
+        if (event.target.classList.contains('add-receta')) {
+            const recetaItem = event.target.closest('.receta-item');
+            const newRecetaItem = recetaItem.cloneNode(true);
+
+            // Limpiar los valores de los inputs en la nueva línea
+            newRecetaItem.querySelectorAll('input').forEach(input => input.value = '');
+            newRecetaItem.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+
+            recetasContainer.appendChild(newRecetaItem);
+        }
+
+        // Eliminar línea
+        if (event.target.classList.contains('remove-receta')) {
+            const recetaItem = event.target.closest('.receta-item');
+            if (document.querySelectorAll('.receta-item').length > 1) {
+                recetaItem.remove();
+            }
+        }
+    });
+});
+</script>
+<style>
+.receta-item {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+}
+
+.receta-item .form-control {
+    width: auto;
+}
+
+.add-receta, .remove-receta {
+    margin-left: 5px;
+}
+</style>
+

@@ -24,7 +24,7 @@ class MoonShineServiceProvider extends MoonShineApplicationServiceProvider
             MenuItem::make('Pacientes', new PacientesResource()),
             MenuItem::make('Consultas', static fn() => route('consultas.index')),
             MenuItem::make('Citas', new CitasResource()),
-            MenuItem::make('Agenda', static fn() => route('agenda')),
+            MenuItem::make('Agenda', static fn() => route('agenda.index')),
             MenuItem::make('Medicos', new MedicoResource()),
             MenuItem::make('Servicios', new ServicioResource()),
             MenuItem::make('Inventarios', new InventarioResource()),
@@ -33,8 +33,5 @@ class MoonShineServiceProvider extends MoonShineApplicationServiceProvider
         ];
     }
 
-    protected function authenticated(Request $request, $user)
-{
-    return redirect()->intended('/dashboard'); // Adjust this to your intended route
-}
+
 }

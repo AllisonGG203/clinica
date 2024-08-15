@@ -7,30 +7,31 @@ use Illuminate\Database\Eloquent\Model;
 
 class Consulta extends Model
 {
+
+    protected $table = 'consultas';
+
     public function paciente()
     {
         return $this->belongsTo(Pacientes::class);
     }
+    public function consulta()
+    {
+    return $this->belongsTo(Consultar::class, 'consulta_id');
+    }
 
-    public function consultar()
-{
-    return $this->belongsTo(Consultar::class, 'consultar_id');
-}
-
-    
-
-
-// App\Models\Consulta.php
-public function receta()
-{
-    return $this->hasOne(Receta::class, 'consulta_id');
-}
-
-
-
-
+    public function receta()
+    {
+        return $this->hasOne(Receta::class, 'consulta_id');
+    }
     public function servicio()
     {
         return $this->belongsTo(Servicio::class);
     }
+    public function Cita()
+    {
+        return $this->belongsTo(cita::class, 'cita_id');
+    }
+    
+
+
 }

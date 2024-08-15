@@ -24,7 +24,7 @@ class Cita extends Model
     }
     public function receta()
     {
-        return $this->hasOne(Receta::class, 'cita_id');
+        return $this->hasOne(Receta::class, 'consulta_id');
     }
     public function servicio()
     {

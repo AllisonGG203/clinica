@@ -5,10 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cita;
 use App\Models\Consulta;
+use App\Models\Consultar;
 use App\Models\Inventario;
 use App\Models\Receta;
 use App\Models\Servicio;
 use App\MoonShine\Resources\ConsultarResource;
+use Barryvdh\DomPDF\Facade as PDF;
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
+use Barryvdh\DomPDF\PDF as DomPDFPDF;
+use Dompdf\Adapter\PDFLib;
 
 //use App\Http\Controllers\ConsultaController;
 
@@ -25,44 +30,15 @@ class ConsultaController extends Controller
 }
 
 
-public function show($id)
-{
-    // Encuentra la consulta específica
-    $consulta = Consulta::with(['paciente', 'receta', 'servicio'])->findOrFail($id);
-
-    // Otros datos que podrías necesitar
-    $medicamentos = Inventario::all();
-    $servicios = Servicio::all();
-
-    // Verifica si la consulta está finalizada y redirige al resumen
-    if ($consulta->estado === 'finalizada') {
-        return view('consultas.resumen', compact('consulta', 'medicamentos', 'servicios'));
-    }
-
-    // Renderiza la vista de consulta
-    return view('consultas.show', compact('consulta', 'medicamentos', 'servicios'));
-}
-
-
-
-
-
-
-public function consultar($id)
-{
-    $cita = Cita::with(['paciente', 'signosVitales', 'receta', 'servicio'])->findOrFail($id);
-
-    return view('consultas.resumen', compact('cita'));
-    
-}
-
-
 public function update(Request $request, $id)
 {
-    // Encuentra la consulta específica
-    $consulta = Consulta::findOrFail($id);
+    // Encontrar la cita correspondiente
+    $cita = Cita::findOrFail($id);
 
-    // Guardar los signos vitales en la tabla 'consultas'
+    // Verificar que la consulta existe y está vinculada a la cita
+    $consulta = Consulta::where('cita_id', $cita->id)->firstOrFail();
+
+    // Actualizar los signos vitales
     $consulta->update([
         'talla' => $request->input('talla'),
         'peso' => $request->input('peso'),
@@ -71,92 +47,87 @@ public function update(Request $request, $id)
         'frecuencia_cardiaca' => $request->input('frecuencia_cardiaca'),
     ]);
 
-    // Guardar la receta en la tabla 'recetas'
-    $consulta->receta()->updateOrCreate(
-        ['consulta_id' => $consulta->id],
-        [
-            'medicamento' => $request->input('medicamento'),
-            'cantidad' => $request->input('cantidad'),
-            'frecuencia' => $request->input('frecuencia'),
-            'duracion' => $request->input('duracion'),
-            'notas' => $request->input('notas_receta'),
-        ]
-    );
-
-    // Cambiar el estado de la consulta a 'finalizada'
+    // Actualizar el estado de la consulta
     $consulta->estado = 'finalizada';
     $consulta->save();
 
     // Redirigir al resumen de la consulta
-    return redirect()->route('consultas.resumen', $consulta->id);
+    return redirect()->route('consultas.resumen', ['id' => $consulta->id]);
+    dd($consulta); // Detiene la ejecución y muestra la consulta, para depuración.
+
 }
+
+
+
 
 
 
 public function store(Request $request)
 {
-    // Crear una nueva instancia de Consulta
     $consulta = new Consulta();
-    
-    // Asignar los valores desde el request
+
+    $consulta->paciente_id = $request->input('paciente_id');
+    $consulta->cita_id = $request->input('cita_id'); 
     $consulta->fecha = $request->input('fecha');
     $consulta->motivo = $request->input('motivo');
-    $consulta->estado = 'en_curso'; // Asegúrate de que el estado se inicializa como 'en_curso'
-
-    // Guardar la consulta para que se genere su ID
+    $consulta->estado = 'en_curso'; 
+    $consulta->talla = $request->input('talla');
+    $consulta->peso = $request->input('peso');
+    $consulta->temperatura = $request->input('temperatura');
+    $consulta->presion_arterial = $request->input('presion_arterial');
+    $consulta->frecuencia_cardiaca = $request->input('frecuencia_cardiaca');
     $consulta->save();
 
-    // Usar el ID de la consulta recién creada para guardar los signos vitales
-    $consulta->signosVitales()->create([
-        'talla' => $request->input('talla'),
-        'peso' => $request->input('peso'),
-        'temperatura' => $request->input('temperatura'),
-        'presion_arterial' => $request->input('presion_arterial'),
-        'frecuencia_cardiaca' => $request->input('frecuencia_cardiaca'),
-    ]);
-
-    // Redirigir a la lista de consultas o mostrar un mensaje de éxito
-    return redirect()->route('consultas.index')->with('status', 'Consulta guardada con éxito');
+    return redirect()->route('consultas.index')->with('status', 'Consulta creada con éxito');
 }
 
 
 
 
 
-public function finalizar($id)
+public function show($id)
 {
-    $consulta = Consulta::findOrFail($id);
-    $consulta->estado = 'finalizada';
-    $consulta->save();
+    
+    $cita = Cita::with(['paciente', 'receta', 'servicio'])->findOrFail($id);
+    $medicamentos = Inventario::all();
+    $servicios = Servicio::all();
 
-    return redirect()->route('consultas.index')->with('success', 'Consulta finalizada exitosamente.');
+    return view('consultas.show', compact('cita', 'medicamentos', 'servicios'));
+}
+
+
     
 
-}
-public function resumen($id)
+    public function resumen($id)
+    {
+        // Aquí buscamos la consulta por su ID
+        $consulta = Consulta::with(['receta', 'servicio', 'paciente'])->findOrFail($id);
+    
+        // Calculamos los costos totales si es necesario
+        $totalMedicamentos = $consulta->receta->cantidad * $consulta->receta->medicamento->precio;
+        $totalServicio = $consulta->servicio->precio;
+        $total = $totalMedicamentos + $totalServicio;
+    
+        // Mostramos la vista con los datos
+       
+        return view('consultas.resumen', compact('consulta'));
+    }
+    
+    
+public function generarPDF(Request $request)
 {
-    // Encuentra la consulta específica
-    $consulta = Consulta::with(['paciente', 'receta', 'servicio'])->findOrFail($id);
+    $data = $request->all(); // Captura todos los datos del formulario
 
-    // Calcula el costo total de la consulta
-    $totalMedicamentos = $consulta->receta->cantidad * $consulta->receta->medicamento->precio;
-    $totalServicio = $consulta->servicio->precio;
-    $total = $totalMedicamentos + $totalServicio;
+    // Procesa los datos y genera el PDF
+    $pdf = \PDF::loadView('consultas.pdf', compact('data'));
 
-    // Renderiza la vista de resumen con los datos necesarios
-    return view('consultas.resumen', compact('consulta', 'totalMedicamentos', 'totalServicio', 'total'));
+    // Devuelve el PDF para descargar
+    return $pdf->download('consulta.pdf');
 }
 
 
 
 
-public function posponer($id)
-{
-    $consulta = Consulta::findOrFail($id);
-    $consulta->estado = 'pospuesta';
-    $consulta->save();
 
-    return redirect()->route('consultas.index')->with('success', 'Consulta pospuesta exitosamente.');
-}
 
 }
