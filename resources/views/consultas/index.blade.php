@@ -31,7 +31,7 @@
                         </td>
                         <td>
                             <a href="{{ route('consultas.show', $cita->id) }}" class="btn btn-primary">Consultar</a>
-                        </td>                        
+                        </td>                                                                      
                         
                     </tr>
                 @endforeach

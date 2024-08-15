@@ -12,6 +12,7 @@ use App\MoonShine\Resources\ServicioResource;
 use App\MoonShine\Resources\UsuariosResource;
 use App\MoonShine\Resources\RolesResource;
 use App\MoonShine\Resources\CitasResource;
+use DragonCode\Contracts\Cashier\Http\Request;
 use MoonShine\Providers\MoonShineApplicationServiceProvider;
 use MoonShine\Menu\MenuItem;
 
@@ -31,4 +32,9 @@ class MoonShineServiceProvider extends MoonShineApplicationServiceProvider
             MenuItem::make('Roles', new RolesResource()),
         ];
     }
+
+    protected function authenticated(Request $request, $user)
+{
+    return redirect()->intended('/dashboard'); // Adjust this to your intended route
+}
 }

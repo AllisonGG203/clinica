@@ -22,14 +22,6 @@ class Cita extends Model
     {
         return $this->belongsTo(pacientes::class, 'id_pacientes');
     }
-
-    public function signosVitales()
-    {
-        return $this->hasOne(SignosVitales::class, 'consulta_id');
-    }
-
-    
-
     public function receta()
     {
         return $this->hasOne(Receta::class, 'cita_id');

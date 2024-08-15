@@ -20,8 +20,10 @@ class Receta extends Model
         'consulta_id', 'medicamento', 'cantidad', 'frecuencia', 'duracion', 'notas'
     ];
 
-    public function consulta()
-    {
-        return $this->belongsTo(Consulta::class);
-    }
+    // App\Models\Receta.php
+public function consulta()
+{
+    return $this->belongsTo(Consulta::class, 'consulta_id');
+}
+
 }

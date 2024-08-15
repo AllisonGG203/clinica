@@ -7,30 +7,30 @@ use Illuminate\Database\Eloquent\Model;
 
 class Consulta extends Model
 {
-    use HasFactory;
-
-    protected $fillable = [
-        'paciente_id', 'motivo', 'notas', 'fecha'
-    ];
-
     public function paciente()
+    {
+        return $this->belongsTo(Pacientes::class);
+    }
+
+    public function consultar()
 {
-    return $this->belongsTo(Pacientes::class, 'id_pacientes');
+    return $this->belongsTo(Consultar::class, 'consultar_id');
 }
 
-public function signosVitales()
-{
-    return $this->hasOne(SignosVitales::class, 'consulta_id');
-}
+    
 
+
+// App\Models\Consulta.php
 public function receta()
 {
     return $this->hasOne(Receta::class, 'consulta_id');
 }
 
-public function servicio()
-{
-    return $this->belongsTo(Servicio::class, 'servicio_id');
-}
 
+
+
+    public function servicio()
+    {
+        return $this->belongsTo(Servicio::class);
+    }
 }
