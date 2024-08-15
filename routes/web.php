@@ -7,6 +7,9 @@ use App\Http\Controllers\CitaController;
 use App\Http\Controllers\MedicoController;
 use App\Http\Controllers\ConsultaController;
 
+Route::get('/', function (){
+    return redirect('/admin');
+});
 
 
 
